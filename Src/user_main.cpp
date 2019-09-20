@@ -9,6 +9,9 @@ void user_code1() {
 
 void user_code2() {
 
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+
+
 	// get instance of camera
 	OV2640 &cam_driver = OV2640::instance();
 	// init camera
@@ -34,6 +37,9 @@ void user_code2() {
 		SEGGER_RTT_printf(0, "%s\n", "CAMERA_ERROR");
 		break;
 	}
+
+	//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
+
 
 }
 
