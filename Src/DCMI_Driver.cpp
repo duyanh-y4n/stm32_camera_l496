@@ -1,33 +1,25 @@
 #include <DCMI_Driver.h>
 
-// TODO: do we need this?
-/**
- * @brief  Initializes the camera hardware
- */
+uint8_t imgBuff[IMAGE_MEM_SIZE * NUM_IMG];
 
 uint8_t captureCmplt = 0;
 uint8_t uartCmplt = 0;
 
-void DCMI_Driver::CAMERA_MsInit(void) {
-	HAL_DCMI_MspInit(&hdcmi);
-}
-
-// TODO: test video capture (dcmi continuous)
 /*
  * @brief  Starts the camera capture in continuous mode.
  * @param  buff: pointer to the camera output buffer
+
+ void DCMI_Driver::CAMERA_ContinuousStart(uint8_t *buff) {
+ HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t) buff,
+ GetSizeInWord(current_resolution));
+ }
  */
-//void DCMI_Driver::CAMERA_ContinuousStart(uint8_t *buff) {
-//	/* Start the camera capture */
-//	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t) buff,
-//			GetSizeInWord(current_resolution));
-//}
 
 /**
  * @brief  Starts the camera capture in snapshot mode.
  * @param  buff: pointer to the camera output buffer
  */
-void DCMI_Driver::CAMERA_SnapshotStart(uint8_t imgNum, uint16_t current_resolution) {
+void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
 
 	/* Start the camera capture */
 
@@ -35,10 +27,6 @@ void DCMI_Driver::CAMERA_SnapshotStart(uint8_t imgNum, uint16_t current_resoluti
 	HAL_StatusTypeDef res;
 
 	uint32_t imgMemSize = GetSizeInByte(current_resolution, COLOR_IMG);
-
-
-	uint8_t imgBuff[imgMemSize * NUM_IMG];
-
 
 	while (count < NUM_IMG) {
 
@@ -87,8 +75,7 @@ void DCMI_Driver::CAMERA_SnapshotStart(uint8_t imgNum, uint16_t current_resoluti
 		}
 
 		//index += 45055;  // DMA_MAX_TRANFER_DATA = 0xAFFF = 45055
-		res = HAL_UART_Transmit_DMA(&huart5, &imgBuff[index],
-					restImg);
+		res = HAL_UART_Transmit_DMA(&huart5, &imgBuff[index], restImg);
 
 		while (!uartCmplt) {
 		}
@@ -214,7 +201,6 @@ uint32_t DCMI_Driver::GetSizeInByte(uint32_t resolution, uint8_t color) {
 	}
 	return size;
 }
-
 
 void DCMI_Driver::CAMERA_LineEventCallback(void) {
 	__HAL_DCMI_CLEAR_FLAG(&hdcmi, DCMI_IT_LINE);

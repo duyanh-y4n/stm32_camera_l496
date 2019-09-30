@@ -1,7 +1,4 @@
 #include "user_main.h"
-#include "I2C_IO.h"
-#include "DCMI_Driver.h"
-#include "OV2640.h"
 
 
 void user_code1() {
@@ -11,14 +8,12 @@ void user_code2() {
 
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
 
-
+	DCMI_Driver dcmi;
 	// get instance of camera
 	OV2640 &cam_driver = OV2640::instance();
+
 	// init camera
 	Camera_StatusTypeDef cam_status = cam_driver.init(IMAGE_RESOLUTION);
-
-	DCMI_Driver dcmi  ;
-	dcmi.CAMERA_MsInit();
 
 	// camera calibration lightroom delay time
 	DWT_Delay_us(CAMERA_LIGHTROOM_CALIBRATION_DELAY);
@@ -27,7 +22,7 @@ void user_code2() {
 
 	switch (cam_status) {
 	case CAMERA_OK:
-		dcmi.CAMERA_SnapshotStart(NUM_IMG,IMAGE_RESOLUTION);
+		dcmi.CAMERA_SnapshotStart(IMAGE_RESOLUTION);
 
 		break;
 	case CAMERA_TIMEOUT:
@@ -39,7 +34,6 @@ void user_code2() {
 	}
 
 	//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
-
 
 }
 
