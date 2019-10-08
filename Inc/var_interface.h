@@ -1,3 +1,10 @@
+/**
+ * File              : var_interface.h
+ * Author            : Duy Anh Pham <duyanh.y4n.pham@gmail.com>
+ * Date              : 08.10.2019
+ * Last Modified Date: 08.10.2019
+ * Last Modified By  : Duy Anh Pham <duyanh.y4n.pham@gmail.com>
+ */
 #ifndef INC_VAR_INTERFACE_H_
 #define INC_VAR_INTERFACE_H_
 
@@ -5,7 +12,7 @@
 extern "C" {
 #endif
 
-#include "stm32l4xx.h"
+#include "stm_hal_userconfig.h"
 
 /* Image mem size in bytes */
 #define CAMERA_R160x120_COLOR_MEMSIZE 0x9600

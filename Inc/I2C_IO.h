@@ -1,3 +1,10 @@
+/**
+ * File              : I2C_IO.h
+ * Author            : Duy Anh Pham <duyanh.y4n.pham@gmail.com>
+ * Date              : 08.10.2019
+ * Last Modified Date: 08.10.2019
+ * Last Modified By  : Duy Anh Pham <duyanh.y4n.pham@gmail.com>
+ */
 #ifndef __I2C_DCMI_DRIVER_H
 #define __I2C_DCMI_DRIVER_H
 
@@ -5,7 +12,7 @@
 extern "C" {
 #endif
 
-#include "stm32l4xx_hal.h"
+#include "stm_hal_userconfig.h"
 #include "var_interface.h"
 #include "SEGGER_RTT.h"
 

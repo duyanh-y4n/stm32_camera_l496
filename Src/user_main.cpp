@@ -1,3 +1,10 @@
+/**
+ * File              : user_main.cpp
+ * Author            : Duy Anh Pham <duyanh.y4n.pham@gmail.com>
+ * Date              : 08.10.2019
+ * Last Modified Date: 08.10.2019
+ * Last Modified By  : Duy Anh Pham <duyanh.y4n.pham@gmail.com>
+ */
 #include "user_main.h"
 #include "OV2640.h"
 #include "DCMI_Driver.h"
