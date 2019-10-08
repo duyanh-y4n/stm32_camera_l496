@@ -1,5 +1,7 @@
 #include "user_main.h"
-
+#include "OV2640.h"
+#include "DCMI_Driver.h"
+#include "I2C_IO.h"
 
 void user_code1() {
 }
