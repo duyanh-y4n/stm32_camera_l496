@@ -63,6 +63,8 @@ MEMORY
 {
 RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 320K
 FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 1024K
+SRAM (xrw)      : ORIGIN = 0x640007F8, LENGTH = 1M
+
 }
 
 /* Define output sections */
@@ -185,7 +187,12 @@ SECTIONS
     . = . + _Min_Heap_Size;
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
-  } >RAM
+  } >SRAM
+  
+   .extdata (NOLOAD) :
+{
+        *(.extdata*)
+ } > SRAM
 
   
 

@@ -24,7 +24,7 @@ extern UART_HandleTypeDef huart5;
 extern DMA_HandleTypeDef hdma_memtomem_dma1_channel1;
 extern TIM_HandleTypeDef htim2;
 
-extern uint8_t image_data[];
+extern uint8_t *externImgBuff;
 static uint32_t lineNum;
 
 /* CAMERA GLOBAL SETTING */
@@ -44,10 +44,6 @@ static uint32_t lineNum;
 #define CAMERA_DEFAULT_COLORMODE CAMERA_BLACK_WHITE_NORMAL
 
 
-// TODO: remove these adresss after Found way to reserved Memory in SRAM
-#define CAMERA_BUFFER_EXTERN (uint8_t *)0x68000800 // data address for external sram
-#define CAMERA_BUFFER_INTERN (uint8_t*) 0x20008000  // data address for internal sram
-
 /*RTT debug activation*/
 
 // comment this line to disable debug
@@ -63,7 +59,7 @@ static uint32_t lineNum;
 
 
 #define DMA_MAX_TRANFER_DATA 0xFFFF
-#define NUM_IMG 2
+#define NUM_IMG 1
 
 extern uint32_t measured_time;
 

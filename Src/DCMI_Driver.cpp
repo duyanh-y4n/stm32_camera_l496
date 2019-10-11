@@ -1,6 +1,10 @@
 #include <DCMI_Driver.h>
 
-uint8_t imgBuff[IMAGE_MEM_SIZE * NUM_IMG];
+#define EXTERN_SRAM_BASE_ADRESSE (uint8_t *)0x64000000;
+
+uint8_t internImgBuff[IMAGE_MEM_SIZE * NUM_IMG];
+uint8_t *externImgBuff = EXTERN_SRAM_BASE_ADRESSE;
+;
 
 uint8_t captureCmplt = 0;
 uint8_t uartCmplt = 0;
@@ -39,7 +43,7 @@ void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
 
 		uint32_t nextElem = count * imgMemSize;
 
-		uint32_t tempAddr = (uint32_t) &imgBuff[nextElem];
+		uint32_t tempAddr = (uint32_t) &internImgBuff[nextElem];
 
 		res = HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, tempAddr, imgSize);
 
@@ -49,6 +53,38 @@ void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
 		CAMERA_Stop();
 		count++;
 		captureCmplt = 0;
+
+	}
+
+	/* DEBUG CODE FOR SRAM */
+
+	// test if data in extern sram was overwritten or not
+//	int overwrittenPosition = 0;
+//	externImgBuff[0] = internImgBuff[0];
+//	for (int i = 1; i < IMAGE_MEM_SIZE * NUM_IMG; i++) {
+//		if (externImgBuff[0] == internImgBuff[0]) {
+//			overwrittenPosition = i;
+//			break;
+//		}
+//
+//		externImgBuff[i] = internImgBuff[i];
+//	}
+//
+//	SEGGER_RTT_printf(0, "%s : %d", "Data was overwritten at index",
+//			overwrittenPosition);
+
+	// test how it was overwritten
+	// 4096 is overwritten position after the first test.
+
+	int counter = 0;
+	externImgBuff = new uint8_t [IMAGE_MEM_SIZE * NUM_IMG];
+
+	for (int j = 1; j < (IMAGE_MEM_SIZE * NUM_IMG); j++) {
+		SEGGER_RTT_printf(0,"%s : %d", "block", j);
+		while (counter < 4096*j) {
+			externImgBuff[counter] = internImgBuff[counter];
+			counter++;
+		}
 
 	}
 
@@ -64,7 +100,7 @@ void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
 
 		uint8_t transmitTime = overflow;
 		while (transmitTime > 0) {
-			res = HAL_UART_Transmit_DMA(&huart5, &imgBuff[index],
+			res = HAL_UART_Transmit_DMA(&huart5, &externImgBuff[index],
 			DMA_MAX_TRANFER_DATA);
 			while (!uartCmplt) {
 			}
@@ -75,7 +111,7 @@ void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
 		}
 
 		//index += 45055;  // DMA_MAX_TRANFER_DATA = 0xAFFF = 45055
-		res = HAL_UART_Transmit_DMA(&huart5, &imgBuff[index], restImg);
+		res = HAL_UART_Transmit_DMA(&huart5, &externImgBuff[index], restImg);
 
 		while (!uartCmplt) {
 		}
