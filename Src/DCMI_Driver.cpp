@@ -1,10 +1,9 @@
 #include <DCMI_Driver.h>
-
+#include <string.h>
 #define EXTERN_SRAM_BASE_ADRESSE (uint8_t *)0x64000000;
+//											0x64000000
 
-uint8_t internImgBuff[IMAGE_MEM_SIZE * NUM_IMG];
-uint8_t *externImgBuff = EXTERN_SRAM_BASE_ADRESSE;
-;
+uint8_t *imgBuff = EXTERN_SRAM_BASE_ADRESSE;
 
 uint8_t captureCmplt = 0;
 uint8_t uartCmplt = 0;
@@ -24,13 +23,9 @@ uint8_t uartCmplt = 0;
  * @param  buff: pointer to the camera output buffer
  */
 void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
-
-	/* Start the camera capture */
-
 	uint8_t count = 0;
 	HAL_StatusTypeDef res;
-
-	uint32_t imgMemSize = GetSizeInByte(current_resolution, COLOR_IMG);
+	uint32_t imgSizeInByte = GetSizeInByte(current_resolution, COLOR_IMG);
 
 	while (count < NUM_IMG) {
 
@@ -39,13 +34,13 @@ void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
 		__HAL_DCMI_ENABLE_IT(&hdcmi,
 				DCMI_IT_FRAME | DCMI_IT_LINE | DCMI_IT_VSYNC);
 
-		uint32_t imgSize = GetSizeInWord(current_resolution);
+		uint32_t imgSizeInWord = GetSizeInWord(current_resolution);
 
-		uint32_t nextElem = count * imgMemSize;
+		uint32_t nextImg = count * imgSizeInByte;
 
-		uint32_t tempAddr = (uint32_t) &internImgBuff[nextElem];
+		uint32_t tempAddr = (uint32_t) &imgBuff[nextImg];
 
-		res = HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, tempAddr, imgSize);
+		res = HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, tempAddr, imgSizeInWord);
 
 		while (!captureCmplt) {
 		}
@@ -56,52 +51,30 @@ void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
 
 	}
 
-	/* DEBUG CODE FOR SRAM */
-
-	// test if data in extern sram was overwritten or not
-//	int overwrittenPosition = 0;
-//	externImgBuff[0] = internImgBuff[0];
-//	for (int i = 1; i < IMAGE_MEM_SIZE * NUM_IMG; i++) {
-//		if (externImgBuff[0] == internImgBuff[0]) {
-//			overwrittenPosition = i;
-//			break;
-//		}
-//
-//		externImgBuff[i] = internImgBuff[i];
-//	}
-//
-//	SEGGER_RTT_printf(0, "%s : %d", "Data was overwritten at index",
-//			overwrittenPosition);
-
-	// test how it was overwritten
-	// 4096 is overwritten position after the first test.
-
-	int counter = 0;
-	externImgBuff = new uint8_t [IMAGE_MEM_SIZE * NUM_IMG];
-
-	for (int j = 1; j < (IMAGE_MEM_SIZE * NUM_IMG); j++) {
-		SEGGER_RTT_printf(0,"%s : %d", "block", j);
-		while (counter < 4096*j) {
-			externImgBuff[counter] = internImgBuff[counter];
-			counter++;
-		}
-
-	}
-
 	count = 0;
 
-	uint16_t overflow = imgMemSize / DMA_MAX_TRANFER_DATA;
-	uint16_t restImg = imgMemSize % DMA_MAX_TRANFER_DATA;
+
+	/*
+	 * DMA can transfer only maximal 0xFFFF Byte
+	 * So we need transfer multiple time
+	 * overflow show how many time we should transfer
+	 * restImg  ist transfer size for the last transfer
+	*/
+
+	uint16_t overflow = imgSizeInByte / DMA_MAX_TRANFER_DATA;
+	uint16_t restImg = imgSizeInByte % DMA_MAX_TRANFER_DATA;
 
 	while (count < NUM_IMG) {
 		// transfer data from sram to host
 
-		uint32_t index = count * imgMemSize;
+		uint32_t index = count * imgSizeInByte;
 
 		uint8_t transmitTime = overflow;
+
 		while (transmitTime > 0) {
-			res = HAL_UART_Transmit_DMA(&huart5, &externImgBuff[index],
+			res = HAL_UART_Transmit_DMA(&huart5, &imgBuff[index],
 			DMA_MAX_TRANFER_DATA);
+
 			while (!uartCmplt) {
 			}
 			uartCmplt = 0;
@@ -110,8 +83,7 @@ void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
 
 		}
 
-		//index += 45055;  // DMA_MAX_TRANFER_DATA = 0xAFFF = 45055
-		res = HAL_UART_Transmit_DMA(&huart5, &externImgBuff[index], restImg);
+		res = HAL_UART_Transmit_DMA(&huart5, &imgBuff[index], restImg);
 
 		while (!uartCmplt) {
 		}
@@ -325,4 +297,5 @@ void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 	uartCmplt = 1;
 }
+
 

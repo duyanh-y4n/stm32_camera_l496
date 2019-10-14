@@ -34,7 +34,7 @@ static uint32_t lineNum;
  * */
 #define CAMERA_DELAY_INTERVAL 200 // in us -  NO OUTPUT or BAD IMAGE if this is too low
 #define CAMERA_INIT_DELAY_MULTIPLICATOR 200 // increase this value if NO OUTPUT picture received
-#define CAMERA_LIGHTROOM_CALIBRATION_DELAY 891500 // in us
+#define CAMERA_LIGHTROOM_CALIBRATION_DELAY 450000 // in us
 
 
 #define IMAGE_MEM_SIZE CAMERA_R320x240_COLOR_MEMSIZE
@@ -59,7 +59,7 @@ static uint32_t lineNum;
 
 
 #define DMA_MAX_TRANFER_DATA 0xFFFF
-#define NUM_IMG 1
+#define NUM_IMG 2
 
 extern uint32_t measured_time;
 

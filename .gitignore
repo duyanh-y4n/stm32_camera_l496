@@ -5,6 +5,7 @@ build/
 doc/
 Inc/user_main.h
 Src/user_main.c
+Src/main.h
 Drivers/CMSIS
 Drivers/STM32*
 *.o
