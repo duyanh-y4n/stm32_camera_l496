@@ -24,9 +24,9 @@ objs = []
 include_dirs = [
      # Third party
     '#Drivers/CMSIS/Include/',
-    '#Drivers/CMSIS/Device/ST/STM32F4xx/Include/',
-    '#Drivers/STM32F4xx_HAL_Driver/Inc/',
-    '#Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/',
+    '#Drivers/CMSIS/Device/ST/STM32L4xx/Include/',
+    '#Drivers/STM32L4xx_HAL_Driver/Inc/',
+    '#Drivers/STM32L4xx_HAL_Driver/Inc/Legacy/',
      # local
     '#Inc/',
     '#SEGGER/RTT/',
@@ -61,7 +61,7 @@ cflags = [ '-std=gnu11']
 
 # linker flags
 linkflags = [
-    '-mcpu=cortex-m4'     , '-mthumb'         , '-TSTM32F429ZITx_FLASH.ld' , '-fsigned-char'        ,
+    '-mcpu=cortex-m4'     , '-mthumb'         , '-TSTM32L496ZGTx_FLASH.ld' , '-fsigned-char'        ,
     '-ffunction-sections' , '-fdata-sections' , '-fmessage-length=0'       , '-mfpu=fpv4-sp-d16'    ,
     '-mfloat-abi=softfp'  , '-Xlinker'        , '--gc-sections'            , '--specs=nosys.specs'
     ]
@@ -77,7 +77,7 @@ cxxflags = [
 #general mixed c assembler options
 asppflags = [ '-mcpu=cortex-m4']
 #User-specified C preprocessor options
-cppdefines = [ 'USE_HAL_DRIVER', 'STM32F429xx', 'HSE_VALUE=8000000',  'USE_FULL_LL_DRIVER']
+cppdefines = [ 'USE_HAL_DRIVER', 'STM32L496xx', 'HSE_VALUE=8000000',  'USE_FULL_LL_DRIVER']
 
 ############################################################### 
 # Setup Build Environment									  #
@@ -159,7 +159,7 @@ for folder in list(set(src_folders)): # avoid duplicates
     else:
         o = SConscript('#/' + sconscript_name, variant_dir=buildDir  + '/' + folder, duplicate = 0)
         objs.append(o)
-objs.append(env.Object('startup_stm32f429xx.s'))
+objs.append(env.Object('startup_stm32l496xx.s'))
 ###### end add src folders ######
 
 
