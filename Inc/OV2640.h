@@ -1,4 +1,11 @@
 /**
+ * File              : OV2640.h
+ * Author            : Duy Anh Pham <duyanh.y4n.pham@gmail.com>
+ * Date              : 08.10.2019
+ * Last Modified Date: 08.10.2019
+ * Last Modified By  : Duy Anh Pham <duyanh.y4n.pham@gmail.com>
+ */
+/**
  ******************************************************************************
  * @file    ov2640.h
  * @author  MCD Application Team
@@ -47,7 +54,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "camera.h"
-#include "stm32l4xx_hal.h"
+#include "stm_hal_userconfig.h"
 #include "dwt_stm32_delay.h"
 #include "var_interface.h"
 #include <I2C_IO.h>

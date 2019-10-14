@@ -1,3 +1,10 @@
+/**
+ * File              : DCMI_Driver.h
+ * Author            : Duy Anh Pham <duyanh.y4n.pham@gmail.com>
+ * Date              : 08.10.2019
+ * Last Modified Date: 08.10.2019
+ * Last Modified By  : Duy Anh Pham <duyanh.y4n.pham@gmail.com>
+ */
 /*
  * dcmi_driver_interface.h
  *
@@ -14,7 +21,6 @@ extern "C" {
 
 #include "SEGGER_RTT.h"
 #include "camera.h"
-#include "stm32l4xx_hal.h"
 #include "var_interface.h"
 #include "dwt_stm32_delay.h"
 
