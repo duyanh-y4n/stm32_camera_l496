@@ -21,7 +21,7 @@ elif os.name == 'nt':
 #####################################################
 # port config
 #####################################################
-ser.baudrate = 230400
+ser.baudrate = 115200
 ser.bytesize = 8
 ser.parity = 'N'
 print(
@@ -37,7 +37,7 @@ print(
 #####################################################
 picSize160x120 = 38400
 picSize320x240 = 153600
-picSize = picSize320x240
+picSize = picSize160x120
 
 raw_img_postfix = ".raw"
 data_buffer = []
@@ -86,7 +86,7 @@ outputName = "image_out"
 flag160x120 = "160x120"
 flag320x240 = "320x240"
 
-flagsize = flag320x240
+flagsize = flag160x120
 
 flags = ["-size " + flagsize, "-sampling-factor 4:2:2", "-depth 8"]
 for i in range(0, num_pics):
