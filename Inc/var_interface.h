@@ -31,7 +31,7 @@ extern UART_HandleTypeDef huart5;
 extern DMA_HandleTypeDef hdma_memtomem_dma1_channel1;
 extern TIM_HandleTypeDef htim2;
 
-extern uint8_t image_data[];
+extern uint8_t *externImgBuff;
 static uint32_t lineNum;
 
 /* CAMERA GLOBAL SETTING */
@@ -41,7 +41,7 @@ static uint32_t lineNum;
  * */
 #define CAMERA_DELAY_INTERVAL 200 // in us -  NO OUTPUT or BAD IMAGE if this is too low
 #define CAMERA_INIT_DELAY_MULTIPLICATOR 200 // increase this value if NO OUTPUT picture received
-#define CAMERA_LIGHTROOM_CALIBRATION_DELAY 891500 // in us
+#define CAMERA_LIGHTROOM_CALIBRATION_DELAY 450000 // in us
 
 
 #define IMAGE_MEM_SIZE CAMERA_R160x120_COLOR_MEMSIZE
@@ -50,10 +50,6 @@ static uint32_t lineNum;
 #define IMAGE_DEFAULT_FORMAT IMAGE_OUTPUT_FORMAT_YUV422
 #define CAMERA_DEFAULT_COLORMODE CAMERA_BLACK_WHITE_NORMAL
 
-
-// TODO: remove these adresss after Found way to reserved Memory in SRAM
-#define CAMERA_BUFFER_EXTERN (uint8_t *)0x68000800 // data address for external sram
-#define CAMERA_BUFFER_INTERN (uint8_t*) 0x20008000  // data address for internal sram
 
 /*RTT debug activation*/
 

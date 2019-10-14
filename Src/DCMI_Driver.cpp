@@ -1,6 +1,9 @@
 #include <DCMI_Driver.h>
+#include <string.h>
+#define EXTERN_SRAM_BASE_ADRESSE (uint8_t *)0x64000000;
+//											0x64000000
 
-uint8_t imgBuff[IMAGE_MEM_SIZE * NUM_IMG];
+uint8_t *imgBuff = EXTERN_SRAM_BASE_ADRESSE;
 
 uint8_t captureCmplt = 0;
 uint8_t uartCmplt = 0;
@@ -20,13 +23,9 @@ uint8_t uartCmplt = 0;
  * @param  buff: pointer to the camera output buffer
  */
 void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
-
-	/* Start the camera capture */
-
 	uint8_t count = 0;
 	HAL_StatusTypeDef res;
-
-	uint32_t imgMemSize = GetSizeInByte(current_resolution, COLOR_IMG);
+	uint32_t imgSizeInByte = GetSizeInByte(current_resolution, COLOR_IMG);
 
 	while (count < NUM_IMG) {
 
@@ -35,13 +34,13 @@ void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
 		__HAL_DCMI_ENABLE_IT(&hdcmi,
 				DCMI_IT_FRAME | DCMI_IT_LINE | DCMI_IT_VSYNC);
 
-		uint32_t imgSize = GetSizeInWord(current_resolution);
+		uint32_t imgSizeInWord = GetSizeInWord(current_resolution);
 
-		uint32_t nextElem = count * imgMemSize;
+		uint32_t nextImg = count * imgSizeInByte;
 
-		uint32_t tempAddr = (uint32_t) &imgBuff[nextElem];
+		uint32_t tempAddr = (uint32_t) &imgBuff[nextImg];
 
-		res = HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, tempAddr, imgSize);
+		res = HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, tempAddr, imgSizeInWord);
 
 		while (!captureCmplt) {
 		}
@@ -54,18 +53,28 @@ void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
 
 	count = 0;
 
-	uint16_t overflow = imgMemSize / DMA_MAX_TRANFER_DATA;
-	uint16_t restImg = imgMemSize % DMA_MAX_TRANFER_DATA;
+
+	/*
+	 * DMA can transfer only maximal 0xFFFF Byte
+	 * So we need transfer multiple time
+	 * overflow show how many time we should transfer
+	 * restImg  ist transfer size for the last transfer
+	*/
+
+	uint16_t overflow = imgSizeInByte / DMA_MAX_TRANFER_DATA;
+	uint16_t restImg = imgSizeInByte % DMA_MAX_TRANFER_DATA;
 
 	while (count < NUM_IMG) {
 		// transfer data from sram to host
 
-		uint32_t index = count * imgMemSize;
+		uint32_t index = count * imgSizeInByte;
 
 		uint8_t transmitTime = overflow;
+
 		while (transmitTime > 0) {
 			res = HAL_UART_Transmit_DMA(&huart5, &imgBuff[index],
 			DMA_MAX_TRANFER_DATA);
+
 			while (!uartCmplt) {
 			}
 			uartCmplt = 0;
@@ -74,7 +83,6 @@ void DCMI_Driver::CAMERA_SnapshotStart(uint16_t current_resolution) {
 
 		}
 
-		//index += 45055;  // DMA_MAX_TRANFER_DATA = 0xAFFF = 45055
 		res = HAL_UART_Transmit_DMA(&huart5, &imgBuff[index], restImg);
 
 		while (!uartCmplt) {
@@ -289,4 +297,5 @@ void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 	uartCmplt = 1;
 }
+
 
